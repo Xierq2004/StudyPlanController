@@ -17,6 +17,7 @@ def home():
 @app.route("/subjects")
 def subjects():
     all_subjects = Subject.query.order_by(Subject.code).all()
+
     return render_template(
         "subjects.html",
         subjects=all_subjects
@@ -53,6 +54,60 @@ def add_subject():
         return redirect(url_for("subjects"))
 
     return render_template("add_subject.html")
+
+
+@app.route("/subjects/<int:subject_id>/edit", methods=["GET", "POST"])
+def edit_subject(subject_id):
+    subject = Subject.query.get_or_404(subject_id)
+
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        code = request.form.get("code", "").strip().upper()
+        colour = request.form.get("colour", "#2563eb")
+
+        if not name or not code:
+            flash("Subject name and code are required.", "error")
+            return render_template(
+                "edit_subject.html",
+               subjects=all_subjects
+            )
+
+        duplicate_subject = Subject.query.filter(
+            Subject.code == code,
+            Subject.id != subject.id
+        ).first()
+
+        if duplicate_subject:
+            flash("This subject code already exists.", "error")
+            return render_template(
+                "edit_subject.html",
+                subjects=all_subjects
+            )
+
+        subject.name = name
+        subject.code = code
+        subject.colour = colour
+
+        db.session.commit()
+
+        flash("Subject updated successfully.", "success")
+        return redirect(url_for("subjects"))
+
+    return render_template(
+        "edit_subject.html",
+        subjects=all_subjects
+    )
+
+
+@app.route("/subjects/<int:subject_id>/delete", methods=["POST"])
+def delete_subject(subject_id):
+    subject = Subject.query.get_or_404(subject_id)
+
+    db.session.delete(subject)
+    db.session.commit()
+
+    flash("Subject deleted successfully.", "success")
+    return redirect(url_for("subjects"))
 
 
 with app.app_context():

@@ -10,8 +10,17 @@
 <body>
     <nav>
         <a href="{{ url_for('home') }}">StudyPlanController</a>
-        <a href="{{ url_for('subjects') }}">Subjects</a>
+
+        {% if request.endpoint == "home" %}
+            <a
+                class="nav-start-button"
+                href="{{ url_for('subjects') }}"
+            >
+                Start
+            </a>
+        {% endif %}
     </nav>
+</nav>
 
     <main>
         {% with messages = get_flashed_messages(with_categories=true) %}
