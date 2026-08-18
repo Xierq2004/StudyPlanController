@@ -2,36 +2,72 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}StudyPlanController{% endblock %}</title>
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+            StudyPlanController
+        {% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
 </head>
+
 <body>
     <nav>
-        <a href="{{ url_for('home') }}">StudyPlanController</a>
+        <a
+            class="nav-brand"
+            href="{{ url_for('home') }}"
+        >
+            StudyPlanController
+        </a>
 
         {% if request.endpoint == "home" %}
             <a
                 class="nav-start-button"
                 href="{{ url_for('subjects') }}"
             >
-                Start
+                开始
             </a>
         {% endif %}
     </nav>
-</nav>
 
-    <main>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% for category, message in messages %}
-                <div class="message {{ category }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endwith %}
+    <div class="{% if request.endpoint == 'home' %}home-layout{% else %}app-layout{% endif %}">
 
-        {% block content %}{% endblock %}
-    </main>
+        {% if request.endpoint != "home" %}
+            <aside class="side-navigation">
+                <p class="side-navigation-title">
+                    Navigation
+                </p>
+
+                <a href="{{ url_for('subjects') }}">
+                    Subjects
+                </a>
+
+                <a href="{{ url_for('tasks') }}">
+                    Tasks
+                </a>
+            </aside>
+        {% endif %}
+
+        <main>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <div class="message {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
 </body>
 </html>
