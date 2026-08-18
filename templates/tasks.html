@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Tasks | StudyPlanController
+{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <div>
+        <h1>Study Tasks</h1>
+        <p>
+            Manage your tasks and upcoming deadlines.
+        </p>
+    </div>
+
+    <a
+        class="button"
+        href="{{ url_for('add_task') }}"
+    >
+        Add Task
+    </a>
+</div>
+
+{% if tasks %}
+    <div class="task-list">
+        {% for task in tasks %}
+            <article class="task-card">
+                <div class="task-card-heading">
+                    <div>
+                        <h2>{{ task.title }}</h2>
+
+                        <p>
+                            {{ task.subject.code }}
+                            -
+                            {{ task.subject.name }}
+                        </p>
+                    </div>
+
+                    <span class="status-badge">
+                        {{ task.status }}
+                    </span>
+                </div>
+
+                {% if task.description %}
+                    <p>{{ task.description }}</p>
+                {% endif %}
+
+                <div class="task-details">
+                    <span>
+                        Due:
+                        {{ task.due_date.strftime(
+                            "%d %b %Y"
+                        ) }}
+                    </span>
+
+                    <span
+                        class="priority-{{ task.priority|lower }}"
+                    >
+                        {{ task.priority }} priority
+                    </span>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No study tasks have been added.</p>
+{% endif %}
+{% endblock %}
