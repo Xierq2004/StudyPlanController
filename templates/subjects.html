@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Subjects | StudyPlanController{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <div>
+        <h1>Subjects</h1>
+        <p>Manage the subjects in your study plan.</p>
+    </div>
+
+    <a class="button" href="{{ url_for('add_subject') }}">
+        Add Subject
+    </a>
+</div>
+
+{% if subjects %}
+    <div class="subject-list">
+        {% for subject in subjects %}
+            <div class="subject-card"
+                 style="border-left-color: {{ subject.colour }};">
+                <h2>{{ subject.code }}</h2>
+                <p>{{ subject.name }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No subjects have been added.</p>
+{% endif %}
+{% endblock %}
