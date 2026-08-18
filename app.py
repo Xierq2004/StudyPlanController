@@ -66,22 +66,32 @@ def edit_subject(subject_id):
         colour = request.form.get("colour", "#2563eb")
 
         if not name or not code:
-            flash("Subject name and code are required.", "error")
-            return render_template(
-                "edit_subject.html",
-               subjects=all_subjects
+            flash(
+                "Subject name and code are required.",
+                "error"
             )
 
-        duplicate_subject = Subject.query.filter(
-            Subject.code == code,
-            Subject.id != subject.id
-        ).first()
-
-        if duplicate_subject:
-            flash("This subject code already exists.", "error")
             return render_template(
                 "edit_subject.html",
-                subjects=all_subjects
+                subject=subject
+            )
+
+        duplicate_subject = Subject.query.filter_by(
+            code=code
+        ).first()
+
+        if (
+            duplicate_subject
+            and duplicate_subject.id != subject.id
+        ):
+            flash(
+                "This subject code already exists.",
+                "error"
+            )
+
+            return render_template(
+                "edit_subject.html",
+                subject=subject
             )
 
         subject.name = name
@@ -90,14 +100,17 @@ def edit_subject(subject_id):
 
         db.session.commit()
 
-        flash("Subject updated successfully.", "success")
+        flash(
+            "Subject updated successfully.",
+            "success"
+        )
+
         return redirect(url_for("subjects"))
 
     return render_template(
         "edit_subject.html",
-        subjects=all_subjects
+        subject=subject
     )
-
 
 @app.route("/subjects/<int:subject_id>/delete", methods=["POST"])
 def delete_subject(subject_id):
