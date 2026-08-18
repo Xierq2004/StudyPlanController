@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime, timedelta
 
 from flask import (
     Flask,
@@ -22,6 +22,44 @@ db.init_app(app)
 @app.route("/")
 def home():
     return render_template("index.html")
+
+
+@app.route("/dashboard")
+def dashboard():
+    today = date.today()
+    next_week = today + timedelta(days=7)
+
+    total_tasks = StudyTask.query.count()
+
+    pending_tasks = StudyTask.query.filter_by(
+        status="Pending"
+    ).count()
+
+    completed_tasks = StudyTask.query.filter_by(
+        status="Completed"
+    ).count()
+
+    overdue_tasks = StudyTask.query.filter(
+        StudyTask.status == "Pending",
+        StudyTask.due_date < today
+    ).count()
+
+    upcoming_tasks = StudyTask.query.filter(
+        StudyTask.status == "Pending",
+        StudyTask.due_date >= today,
+        StudyTask.due_date <= next_week
+    ).order_by(
+        StudyTask.due_date
+    ).limit(5).all()
+
+    return render_template(
+        "dashboard.html",
+        total_tasks=total_tasks,
+        pending_tasks=pending_tasks,
+        completed_tasks=completed_tasks,
+        overdue_tasks=overdue_tasks,
+        upcoming_tasks=upcoming_tasks
+    )
 
 
 @app.route("/subjects")
@@ -184,18 +222,9 @@ def add_task():
             "description",
             ""
         ).strip()
-        due_date_text = request.form.get(
-            "due_date",
-            ""
-        )
-        priority = request.form.get(
-            "priority",
-            "Medium"
-        )
-        subject_id_text = request.form.get(
-            "subject_id",
-            ""
-        )
+        due_date_text = request.form.get("due_date", "")
+        priority = request.form.get("priority", "Medium")
+        subject_id_text = request.form.get("subject_id", "")
 
         if not title or not due_date_text or not subject_id_text:
             flash(
@@ -275,6 +304,7 @@ def add_task():
         subjects=all_subjects
     )
 
+
 @app.route(
     "/tasks/<int:task_id>/edit",
     methods=["GET", "POST"]
@@ -292,18 +322,9 @@ def edit_task(task_id):
             "description",
             ""
         ).strip()
-        due_date_text = request.form.get(
-            "due_date",
-            ""
-        )
-        priority = request.form.get(
-            "priority",
-            "Medium"
-        )
-        subject_id_text = request.form.get(
-            "subject_id",
-            ""
-        )
+        due_date_text = request.form.get("due_date", "")
+        priority = request.form.get("priority", "Medium")
+        subject_id_text = request.form.get("subject_id", "")
 
         if not title or not due_date_text or not subject_id_text:
             flash(
@@ -420,6 +441,7 @@ def delete_task(task_id):
         "success"
     )
     return redirect(url_for("tasks"))
+
 
 with app.app_context():
     db.create_all()

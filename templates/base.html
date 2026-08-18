@@ -32,7 +32,7 @@
         {% if request.endpoint == "home" %}
             <a
                 class="nav-start-button"
-                href="{{ url_for('subjects') }}"
+                href="{{ url_for('dashboard') }}"
             >
                 开始
             </a>
@@ -46,6 +46,10 @@
                 <p class="side-navigation-title">
                     Navigation
                 </p>
+
+                <a href="{{ url_for('dashboard') }}">
+                    Dashboard
+                </a>
 
                 <a href="{{ url_for('subjects') }}">
                     Subjects

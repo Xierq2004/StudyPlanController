@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | StudyPlanController{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <div>
+        <h1>Dashboard</h1>
+        <p>View your study progress and upcoming deadlines.</p>
+    </div>
+
+    <a class="button" href="{{ url_for('add_task') }}">
+        Add Task
+    </a>
+</div>
+
+<div class="dashboard-grid">
+    <div class="dashboard-card">
+        <span>Total Tasks</span>
+        <strong>{{ total_tasks }}</strong>
+    </div>
+
+    <div class="dashboard-card pending-card">
+        <span>Pending</span>
+        <strong>{{ pending_tasks }}</strong>
+    </div>
+
+    <div class="dashboard-card completed-card">
+        <span>Completed</span>
+        <strong>{{ completed_tasks }}</strong>
+    </div>
+
+    <div class="dashboard-card overdue-card">
+        <span>Overdue</span>
+        <strong>{{ overdue_tasks }}</strong>
+    </div>
+</div>
+
+<section class="upcoming-section">
+    <div class="section-heading">
+        <div>
+            <h2>Upcoming Deadlines</h2>
+            <p>Tasks due during the next seven days.</p>
+        </div>
+
+        <a href="{{ url_for('tasks') }}">
+            View all tasks
+        </a>
+    </div>
+
+    {% if upcoming_tasks %}
+        <div class="upcoming-list">
+            {% for task in upcoming_tasks %}
+                <div class="upcoming-item">
+                    <div>
+                        <strong>{{ task.title }}</strong>
+                        <p>
+                            {{ task.subject.code }} -
+                            {{ task.subject.name }}
+                        </p>
+                    </div>
+
+                    <span>
+                        {{ task.due_date.strftime("%d %b %Y") }}
+                    </span>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No tasks are due during the next seven days.</p>
+    {% endif %}
+</section>
+{% endblock %}
