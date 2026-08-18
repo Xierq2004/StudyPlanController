@@ -485,4 +485,55 @@ form {
     .task-card-heading {
         flex-direction: column;
     }
+
+    .task-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.task-actions form {
+    max-width: none;
+    margin: 0;
+}
+
+.complete-button {
+    padding: 8px 14px;
+    background-color: #16a34a;
+}
+
+.complete-button:hover {
+    background-color: #15803d;
+}
+
+.reopen-button {
+    padding: 8px 14px;
+    background-color: #d97706;
+}
+
+.reopen-button:hover {
+    background-color: #b45309;
+}
+
+.status-completed {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.task-completed {
+    border-color: #86efac;
+    background-color: #f0fdf4;
+}
+
+.task-completed h2 {
+    color: var(--muted);
+    text-decoration: line-through;
+}
 }

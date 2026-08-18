@@ -275,6 +275,151 @@ def add_task():
         subjects=all_subjects
     )
 
+@app.route(
+    "/tasks/<int:task_id>/edit",
+    methods=["GET", "POST"]
+)
+def edit_task(task_id):
+    task = StudyTask.query.get_or_404(task_id)
+
+    all_subjects = Subject.query.order_by(
+        Subject.code
+    ).all()
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        description = request.form.get(
+            "description",
+            ""
+        ).strip()
+        due_date_text = request.form.get(
+            "due_date",
+            ""
+        )
+        priority = request.form.get(
+            "priority",
+            "Medium"
+        )
+        subject_id_text = request.form.get(
+            "subject_id",
+            ""
+        )
+
+        if not title or not due_date_text or not subject_id_text:
+            flash(
+                "Title, subject and due date are required.",
+                "error"
+            )
+            return render_template(
+                "edit_task.html",
+                task=task,
+                subjects=all_subjects
+            )
+
+        try:
+            due_date = datetime.strptime(
+                due_date_text,
+                "%Y-%m-%d"
+            ).date()
+        except ValueError:
+            flash(
+                "Enter a valid due date.",
+                "error"
+            )
+            return render_template(
+                "edit_task.html",
+                task=task,
+                subjects=all_subjects
+            )
+
+        try:
+            subject_id = int(subject_id_text)
+        except ValueError:
+            flash(
+                "Select a valid subject.",
+                "error"
+            )
+            return render_template(
+                "edit_task.html",
+                task=task,
+                subjects=all_subjects
+            )
+
+        subject = db.session.get(
+            Subject,
+            subject_id
+        )
+
+        if subject is None:
+            flash(
+                "The selected subject does not exist.",
+                "error"
+            )
+            return render_template(
+                "edit_task.html",
+                task=task,
+                subjects=all_subjects
+            )
+
+        if priority not in {"Low", "Medium", "High"}:
+            priority = "Medium"
+
+        task.title = title
+        task.description = description
+        task.due_date = due_date
+        task.priority = priority
+        task.subject_id = subject.id
+
+        db.session.commit()
+
+        flash(
+            "Task updated successfully.",
+            "success"
+        )
+        return redirect(url_for("tasks"))
+
+    return render_template(
+        "edit_task.html",
+        task=task,
+        subjects=all_subjects
+    )
+
+
+@app.route(
+    "/tasks/<int:task_id>/toggle",
+    methods=["POST"]
+)
+def toggle_task(task_id):
+    task = StudyTask.query.get_or_404(task_id)
+
+    if task.status == "Pending":
+        task.status = "Completed"
+        message = "Task marked as completed."
+    else:
+        task.status = "Pending"
+        message = "Task returned to pending."
+
+    db.session.commit()
+
+    flash(message, "success")
+    return redirect(url_for("tasks"))
+
+
+@app.route(
+    "/tasks/<int:task_id>/delete",
+    methods=["POST"]
+)
+def delete_task(task_id):
+    task = StudyTask.query.get_or_404(task_id)
+
+    db.session.delete(task)
+    db.session.commit()
+
+    flash(
+        "Task deleted successfully.",
+        "success"
+    )
+    return redirect(url_for("tasks"))
 
 with app.app_context():
     db.create_all()
